@@ -22,6 +22,9 @@ func ffHandler(prefix string) hreqFun {
 	}
 
 }
+
+//
+//
 func roomHandler(prefix string, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
@@ -29,7 +32,8 @@ func roomHandler(prefix string, w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		title := r.URL.Path[len(prefix):]
 		body, err := io.ReadAll(r.Body)
-		fmt.Printf("save %s --> %d\n", title, len(body))
+		dt := time.Now()
+		fmt.Printf("save %s %s --> %d\n", dt.Format("15:04:05"), title, len(body))
 		if err != nil {
 			panic(err)
 		}
@@ -41,7 +45,8 @@ func roomHandler(prefix string, w http.ResponseWriter, r *http.Request) {
 		title := r.URL.Path[len(prefix):]
 
 		body, err := cache.Get(title)
-		fmt.Printf("load %s --> %d\n", title, len(body))
+		dt := time.Now()
+		fmt.Printf("load %s %s --> %d\n", dt.Format("15:04:05"), title, len(body))
 
 		if err != nil {
 			http.Error(w, "body not found", http.StatusBadRequest)
@@ -57,7 +62,7 @@ var cache *big.BigCache
 
 // const expire int = 600 // expire in 600 seconds
 func main() {
-	cache, _ = big.NewBigCache(big.DefaultConfig(10 * time.Minute))
+	cache, _ = big.NewBigCache(big.DefaultConfig(1440 * time.Minute))
 
 	http.HandleFunc(ROOM, ffHandler(ROOM))
 	http.HandleFunc(SHARE, ffHandler(SHARE))
